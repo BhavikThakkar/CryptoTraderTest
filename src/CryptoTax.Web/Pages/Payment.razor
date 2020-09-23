@@ -1,0 +1,28 @@
+﻿@page "/Payment/{Id:guid}"
+
+@inject ICurrentUserAccessor CurrentUserAccessor
+@inject IReportViewService ReportViewService
+@inject NavigationManager Navigator
+
+@using Features.Billing.Models
+@using CryptoTax.Web.Features.Billing
+
+@if (_user != null && _report != null)
+{
+    <PaymentForm User="@_user" Report="@_report"></PaymentForm>
+}
+
+@code {
+
+    [Parameter] public Guid Id { get; set; }
+    private User _user;
+    private Report _report;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _user = await CurrentUserAccessor.GetUserAsync();
+        var reports = await ReportViewService.GetReportsAsync(_user);
+        _report = reports.SingleOrDefault(o => o.Id == Id);
+
+    }
+}

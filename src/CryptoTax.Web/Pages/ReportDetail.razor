@@ -1,0 +1,26 @@
+﻿@page "/Report/{Id:guid}"
+
+@inject ICurrentUserAccessor CurrentUserAccessor
+@inject IReportViewService ReportViewService
+
+@if (_user != null && _report != null)
+{
+    <h1 class="text-2xl">Hello, @_user.Name. Here is your @_report.TaxYear  Report:</h1>
+    <ReportOverview Report="@_report" />
+}
+
+@code {
+
+    [Parameter] public Guid Id { get; set; }
+
+    private User _user;
+    private Report _report;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _user = await CurrentUserAccessor.GetUserAsync();
+        var reports = await ReportViewService.GetReportsAsync(_user);
+
+        _report = reports.SingleOrDefault(o => o.Id == Id);
+    }
+}

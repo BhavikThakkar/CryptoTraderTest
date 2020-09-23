@@ -1,0 +1,90 @@
+﻿@inject IBillingService BillingService
+@inject ICurrentUserAccessor CurrentUserAccessor
+@inject IReportViewService ReportViewService
+@inject IPurchaseService PurchaseService
+@inject NavigationManager Navigator
+
+@using Features.Billing.Models
+
+@if (User != null && Report != null)
+{
+    <EditForm Model="@paymentRequest" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <div class="bg-white shadow-md rounded p-5">
+            <h1 class="text-2xl mt-1 mb-4">Hello, @User.Name. Please make payment to continue using reporting services.</h1>
+            <div class="flex flex-wrap -mx-3 mb-6">
+                <div class="w-full px-3">
+                    <label for="cardNum" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Card Number:</label>
+                    <input id="cardNum" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" type="number"
+                           @bind="paymentRequest.CreditCardNumber"  />
+                    
+                    <p class="text-red-500 italic"><ValidationMessage For="@(() => paymentRequest.CreditCardNumber)" /></p>
+
+                </div>
+            </div>
+            <div class="flex flex-wrap -mx-3 mb-2">
+                <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                    <label for="cardExpiryMo" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Expiration Month:</label>
+                    <input id="cardExpiryMo" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" type="number"
+                           @bind="paymentRequest.CardExpiryMonth" />
+                    <p class="text-red-500 italic"><ValidationMessage For="@(() => paymentRequest.CardExpiryMonth)" /></p>
+
+                </div>
+                <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                    <label for="cardExpiryYear" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Expiration Year:</label>
+                    <input id="cardExpiryYear" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" type="number"
+                           @bind="paymentRequest.CardExpiryYear" />
+                    <p class="text-red-500 italic"><ValidationMessage For="@(() => paymentRequest.CardExpiryYear)" /></p>
+
+                </div>
+                <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                    <label for="cardCvc" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">CVC Security Code:</label>
+                    <input id="cardCvc" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" type="number"
+                           @bind="paymentRequest.CardCvc" />
+                    <p class="text-red-500 italic"><ValidationMessage For="@(() => paymentRequest.CardCvc)" /></p>
+
+                </div>
+            </div>
+
+            <div class="row my-2">
+                <div class="col-12 text-right">
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Submit</button>
+                </div>
+            </div>
+        </div>
+
+
+    </EditForm>
+}
+@code {
+
+    [Parameter] public User User { get; set; }
+    [Parameter] public Report Report { get; set; }
+
+    private PaymentRequest paymentRequest;
+
+    protected override async Task OnInitializedAsync()
+    {
+        int payableAmount = await BillingService.CalculatePriceAsync(new BillingContext(User, Report));
+
+        paymentRequest = new PaymentRequest(User.Id, payableAmount);
+    }
+
+
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+            PurchaseRequest purchaseRequest = new PurchaseRequest(User.Id, paymentRequest.AmountInCents);
+            var isSuccessful = await PurchaseService.PurchaseAsync(User, Report, paymentRequest, purchaseRequest);
+
+            //if purchase go well then redirect  user to requested report.
+            if (isSuccessful)
+                Navigator.NavigateTo($"/Report/{Report.Id}");
+        }
+        catch (Exception Ex)
+        {
+            // TODO - Log exception details.
+        }
+    }
+}

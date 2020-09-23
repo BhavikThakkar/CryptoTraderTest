@@ -1,0 +1,11 @@
+﻿<div class="mt-5 grid grid-cols-1 rounded-lg bg-white overflow-hidden shadow md:grid-cols-4">
+    <ReportDetail Header="Trades" Value="@Report.TradeCount.ToString()" />
+    <ReportDetail Header="Incoming Transactions" Value="@Report.IncomingTxCount.ToString()" />
+    <ReportDetail Header="Outgoing Transactions" Value="@Report.OutgoingTxCount.ToString()" />
+    <ReportDetail Header="Capital Gains" Value="@Report.NetRealizedGains.ToString()" />
+</div>
+
+@code {
+
+  [Parameter] public Report Report { get; set; }
+}

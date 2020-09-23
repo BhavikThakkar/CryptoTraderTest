@@ -1,0 +1,20 @@
+﻿<div class="border-t border-gray-200 md:border-0 md:border-l">
+  <div class="px-4 py-5">
+    <dl>
+      <dt class="text-lg leading-6 font-bold text-gray-900">
+        @Header
+      </dt>
+      <dd class="mt-1 flex justify-between items-baseline md:block lg:flex">
+        <div class="flex items-baseline text-2xl leading-8 font-semibold text-indigo-600">
+          @Value
+        </div>
+      </dd>
+    </dl>
+  </div>
+</div>
+
+@code {
+
+  [Parameter] public string Header { get; set; }
+  [Parameter] public string Value { get; set; }
+}

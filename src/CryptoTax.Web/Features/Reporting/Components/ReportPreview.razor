@@ -1,0 +1,21 @@
+﻿<div class="mt-5 grid grid-cols-1 rounded-lg bg-white overflow-hidden shadow md:grid-cols-4">
+    <ReportDetail Header="Trades" Value="@Report.TradeCount.ToString()" />
+    <ReportDetail Header="Incoming Transactions" Value="@Report.IncomingTxCount.ToString()" />
+    <ReportDetail Header="Outgoing Transactions" Value="@Report.OutgoingTxCount.ToString()" />
+
+    <div class="flex justify-center items-center border-t border-gray-200 md:border-0 md:border-l">
+        <div class="px-4 py-5">
+            <span class="inline-flex rounded-md shadow-sm">
+                <button @onclick="@(() => OnClick.InvokeAsync(Report.Id))" type="button" class="inline-flex items-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-lg text-white bg-green-400 hover:bg-green-500 focus:outline-none focus:border-green-500 focus:shadow-outline-green active:bg-green-500 transition ease-in-out duration-150">
+                    View Report
+                </button>
+            </span>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter] public Report Report { get; set; }
+    [Parameter] public EventCallback<Guid> OnClick { get; set; }
+}

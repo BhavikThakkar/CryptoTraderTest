@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "name": "asp.net",
+  "private": true,
+  "devDependencies": {
+    "@tailwindcss/ui": "^0.6.2",
+    "gulp": "^4.0.2",
+    "gulp-postcss": "^8.0.0",
+    "precss": "^4.0.0",
+    "tailwindcss": "^1.8.10"
+  },
+  "scripts": {
+    "build": "npm install && gulp build"
+  }
+}

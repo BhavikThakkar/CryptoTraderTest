@@ -1,0 +1,39 @@
+﻿@page "/"
+@page "/Reports"
+
+@inject ICurrentUserAccessor CurrentUserAccessor
+@inject IReportViewService ReportViewService
+@inject NavigationManager Navigator
+@inject IBillingService BillingService
+
+@if (_user != null)
+{
+    <h1 class="text-2xl">Hello, @_user.Name</h1>
+
+    @foreach (var report in _reports)
+    {
+        <ReportPreview Report="@report" OnClick="OnButtonClick" />
+    }
+}
+
+@code {
+
+    private User _user;
+    private IOrderedEnumerable<Report> _reports;
+
+    private void OnButtonClick(Guid reportId)
+    {
+        Report report = _reports.Where(x => x.Id == reportId).FirstOrDefault();
+        var hasAccess = BillingService.HasAccessAsync(new Features.Billing.Models.BillingContext(_user, report)).Result;
+        if (hasAccess)
+            Navigator.NavigateTo($"/Report/{reportId}");
+        else
+            Navigator.NavigateTo($"/Payment/{reportId}");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _user = await CurrentUserAccessor.GetUserAsync();
+        _reports = await ReportViewService.GetReportsAsync(_user);
+    }
+}
